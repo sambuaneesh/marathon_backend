@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from server import Flask, request, jsonify
 from PIL import Image
 import torch
 from torchvision import transforms

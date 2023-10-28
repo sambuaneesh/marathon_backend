@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from server import Flask, request, jsonify
 from keras.models import load_model
 from keras.preprocessing import image
 import numpy as np
@@ -10,16 +10,16 @@ model = load_model("ResNet50V2_eurosat.h5")
 
 # Define class labels
 class_labels = [
-    "class1",
-    "class2",
-    "class3",
-    "class4",
-    "class5",
-    "class6",
-    "class7",
-    "class8",
-    "class9",
-    "class10",
+    "AnnualCrop",
+    "Forest",
+    "HerbaceousVegetation",
+    "Highway",
+    "Industrial",
+    "Pasture",
+    "PermanentCrop",
+    "Residential",
+    "River",
+    "SeaLake",
 ]
 
 
