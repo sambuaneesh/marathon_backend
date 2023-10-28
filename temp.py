@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from server import Flask, request, jsonify
 from PIL import Image
 import tensorflow as tf
 from tensorflow.keras.models import load_model
