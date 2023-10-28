@@ -4,3 +4,4 @@ test_images/
 *.ipynb
 *.pt
 *.h5
+*.png

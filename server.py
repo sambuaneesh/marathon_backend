@@ -11,12 +11,14 @@ import argparse
 app = Flask(__name__)
 CORS(app)
 
-# Load PyTorch model and move it to the CPU
-torch_model = torch.load("PaddyDoctorResnet.pt", map_location=torch.device("cpu"))
-torch_model.eval()
+# Load PyTorch model and move it to the CPU (Disease Classification)
+disease_model = torch.load(
+    "PaddyDoctorResnet.pt", map_location=torch.device("cpu")
+)  # torch_model
+disease_model.eval()
 
-# Load Keras model
-keras_model = load_model("ResNet50V2_eurosat.h5")
+# Load Keras model (Land Classification)
+land_model = load_model("ResNet50V2_eurosat.h5")  # keras_model
 
 # Define transformations for the PyTorch model
 torch_transform = transforms.Compose(
@@ -28,7 +30,7 @@ torch_transform = transforms.Compose(
 )
 
 # Define class labels for the Keras model
-keras_class_labels = [
+land_class_labels = [
     "AnnualCrop",
     "Forest",
     "HerbaceousVegetation",
@@ -42,7 +44,7 @@ keras_class_labels = [
 ]
 
 # Define class labels for the PyTorch model
-torch_class_labels = [
+disease_class_labels = [
     "bacterial_leaf_blight",
     "bacterial_leaf_streak",
     "bacterial_panicle_blight",
@@ -57,16 +59,16 @@ torch_class_labels = [
 
 
 # Routes for PyTorch model
-@app.route("/predict", methods=["POST"])
+@app.route("/predict-disease", methods=["POST"])
 def predict_torch():
     try:
         image_file = request.files["image"]
         image = Image.open(image_file).convert("RGB")
         input_tensor = torch_transform(image).unsqueeze(0)
         with torch.no_grad():
-            output = torch_model(input_tensor)
+            output = disease_model(input_tensor)
             _, pred = torch.max(output, 1)
-        predicted_label = torch_class_labels[pred.item()]
+        predicted_label = disease_class_labels[pred.item()]
         print("PyTorch Prediction successful.")
         return predicted_label
     except Exception as e:
@@ -75,7 +77,7 @@ def predict_torch():
 
 
 # Routes for Keras model
-@app.route("/alsopredict", methods=["POST"])
+@app.route("/predict-land", methods=["POST"])
 def predict_keras():
     try:
         image_file = request.files["image"]
@@ -84,9 +86,9 @@ def predict_keras():
         x = keras_image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         x = x / 255.0
-        predictions = keras_model.predict(x)
+        predictions = land_model.predict(x)
         predicted_class_index = np.argmax(predictions)
-        predicted_class = keras_class_labels[predicted_class_index]
+        predicted_class = land_class_labels[predicted_class_index]
         print("Keras Prediction successful.")
         return predicted_class
     except Exception as e:
