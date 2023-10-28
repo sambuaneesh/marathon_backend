@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_cors import CORS
 from PIL import Image
 import torch
@@ -68,10 +68,10 @@ def predict_torch():
             _, pred = torch.max(output, 1)
         predicted_label = torch_class_labels[pred.item()]
         print("PyTorch Prediction successful.")
-        return jsonify({"success": True, "predicted_label": predicted_label})
+        return predicted_label
     except Exception as e:
         print(f"PyTorch Prediction failed: {str(e)}")
-        return jsonify({"success": False, "error": str(e)})
+        return str(e)
 
 
 # Routes for Keras model
@@ -88,12 +88,10 @@ def predict_keras():
         predicted_class_index = np.argmax(predictions)
         predicted_class = keras_class_labels[predicted_class_index]
         print("Keras Prediction successful.")
-        return jsonify({"success": True, "predicted_class": predicted_class})
+        return predicted_class
     except Exception as e:
         print(f"Keras Prediction failed: {str(e)}")
-        return jsonify({"success": False, "error": str(e)})
-        # return string
-        re
+        return str(e)
 
 
 if __name__ == "__main__":
