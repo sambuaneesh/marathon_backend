@@ -1,0 +1,6 @@
+.vscode/
+test_images/
+*.jpg
+*.ipynb
+*.pt
+*.h5
