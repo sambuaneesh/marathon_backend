@@ -1,6 +1,7 @@
 .vscode/
 test_images/
 *.jpg
+*.jpeg
 *.ipynb
 *.pt
 *.h5

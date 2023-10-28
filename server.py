@@ -20,6 +20,9 @@ disease_model.eval()
 # Load Keras model (Land Classification)
 land_model = load_model("ResNet50V2_eurosat.h5")  # keras_model
 
+# Load Keras model for crop classification
+crop_model = load_model("Inception-V1.h5")
+
 # Define transformations for the PyTorch model
 torch_transform = transforms.Compose(
     [
@@ -55,6 +58,39 @@ disease_class_labels = [
     "hispa",
     "normal",
     "tungro",
+]
+
+crop_class_labels = [
+    "Cherry",
+    "Coffee-plant",
+    "Cucumber",
+    "Fox_nut(Makhana)",
+    "Lemon",
+    "Olive-tree",
+    "Pearl_millet(bajra)",
+    "Tobacco-plant",
+    "almond",
+    "banana",
+    "cardamom",
+    "chilli",
+    "clove",
+    "coconut",
+    "cotton",
+    "gram",
+    "jowar",
+    "jute",
+    "maize",
+    "mustard-oil",
+    "papaya",
+    "pineapple",
+    "paddy",
+    "soyabean",
+    "sugarcane",
+    "sunflower",
+    "tea",
+    "tomato",
+    "vigna-radiati(Mung)",
+    "wheat",
 ]
 
 
@@ -93,6 +129,31 @@ def predict_keras():
         return predicted_class
     except Exception as e:
         print(f"Keras Prediction failed: {str(e)}")
+        return str(e)
+
+
+@app.route("/classify-crop", methods=["POST"])
+def classify_crop():
+    try:
+        image_file = request.files["image"]
+        img = Image.open(image_file).convert("RGB")
+        img = img.resize(
+            (256, 256)
+        )  # Resize the image to match the expected input shape
+        x = keras_image.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        x = x / 255.0
+        predictions = crop_model.predict(x)
+        predicted_class_index = np.argmax(predictions)
+        predicted_class = crop_class_labels[predicted_class_index]
+        print("Keras Prediction (Crop Classification) successful.")
+        # if predicted_class == paddy then return predicted_class else return "could be +" predicted_class
+        if predicted_class == "paddy":
+            return predicted_class
+        else:
+            return "could be " + predicted_class
+    except Exception as e:
+        print(f"Keras Prediction (Crop Classification) failed: {str(e)}")
         return str(e)
 
 
