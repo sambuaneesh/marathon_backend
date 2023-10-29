@@ -20,6 +20,9 @@ disease_model.eval()
 # Load Keras model (Land Classification)
 land_model = load_model("ResNet50V2_eurosat.h5")  # keras_model
 
+# Load Keras model for paddy type classification
+paddy_model = load_model("classification_paddy.h5")
+
 # Load Keras model for crop classification
 crop_model = load_model("Inception-V1.h5")
 
@@ -93,6 +96,19 @@ crop_class_labels = [
     "wheat",
 ]
 
+paddy_class_labels = [
+    "ADT45",
+    "IR20",
+    "KarnatakaPonni",
+    "Onthanel",
+    "Ponni",
+    "Surya",
+    "Zonal",
+    "AndraPonni",
+    "AtchayaPonni",
+    "tungro",
+]
+
 
 # Routes for PyTorch model
 @app.route("/predict-disease", methods=["POST"])
@@ -154,6 +170,27 @@ def classify_crop():
             return "could be " + predicted_class
     except Exception as e:
         print(f"Keras Prediction (Crop Classification) failed: {str(e)}")
+        return str(e)
+
+
+@app.route("/classify-paddy", methods=["POST"])
+def classify_paddy():
+    try:
+        image_file = request.files["image"]
+        img = Image.open(image_file).convert("RGB")
+        img = img.resize(
+            (480, 480)
+        )  # Resize the image to match the expected input shape
+        x = keras_image.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        x = x / 255.0
+        predictions = paddy_model.predict(x)
+        predicted_class_index = np.argmax(predictions)
+        predicted_class = paddy_class_labels[predicted_class_index]
+        print("Keras Prediction (Paddy Classification) successful.")
+        return predicted_class
+    except Exception as e:
+        print(f"Keras Prediction (Paddy Classification) failed: {str(e)}")
         return str(e)
 
 

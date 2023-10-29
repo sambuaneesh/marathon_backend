@@ -6,3 +6,8 @@ test_images/
 *.pt
 *.h5
 *.png
+Agricultural-crops/
+Rice_Image_Dataset_Seg/
+*.webp
+yolov5/
+*zip
