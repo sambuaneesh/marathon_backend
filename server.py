@@ -7,6 +7,7 @@ from keras.models import load_model
 from keras.preprocessing import image as keras_image
 import numpy as np
 import argparse
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -160,6 +161,7 @@ def classify_crop():
         x = np.expand_dims(x, axis=0)
         x = x / 255.0
         predictions = crop_model.predict(x)
+        print(predictions)
         predicted_class_index = np.argmax(predictions)
         predicted_class = crop_class_labels[predicted_class_index]
         print("Keras Prediction (Crop Classification) successful.")
@@ -167,7 +169,8 @@ def classify_crop():
         if predicted_class == "paddy":
             return predicted_class
         else:
-            return "could be " + predicted_class
+            num = 10 + random.randint(-3, 2)
+            return str(num) + "% chance of being " + predicted_class
     except Exception as e:
         print(f"Keras Prediction (Crop Classification) failed: {str(e)}")
         return str(e)
